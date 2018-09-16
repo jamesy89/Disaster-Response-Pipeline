@@ -43,8 +43,8 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
 
-    request_counts = df['request'].value_counts()
-    print(request_counts)
+    #request_counts = df['request'].value_counts()
+    #print(request_counts)
     storm_counts = df['storm'].value_counts()
 
     # create visuals
