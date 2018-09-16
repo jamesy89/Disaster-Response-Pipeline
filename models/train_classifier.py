@@ -1,24 +1,71 @@
 import sys
+import pickle
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import classification_report
+from sklearn.cross_validation import train_test_split
+from sklearn.multioutput import MultiOutputClassifier
+from sqlalchemy import *
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import fbeta_score, accuracy_score
+from sklearn.pipeline import Pipeline
 
 
 def load_data(database_filepath):
-    pass
+    # load data from database
+    engine = create_engine(database_filepath)
+    df = pd.read_sql_table('InsertTableName', engine)
+    #df.head()
+    X = df['message']
+    Y = df.iloc[:,4:]
+    categories = list(Y)
+
+    return X, Y, categories
 
 
 def tokenize(text):
-    pass
+    count_vect = CountVectorizer()
+    X_train_counts = count_vect.fit_transform(twenty_train.data)
+    X_train_counts.shape
+
+    tfidf_transformer = TfidfTransformer()
+    X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
+    X_train_tfidf.shape
+
+    return X_train_tf
 
 
 def build_model():
-    pass
+    # Create ML pipeline
+    pipeline = Pipeline([('vect', CountVectorizer()),
+                      ('tfidf', TfidfTransformer()),
+                      ('clf', MultiOutputClassifier(MultinomialNB())),])
 
+    # Parameters to grid search
+    parameters = parameters = {'tfidf__use_idf': (True, False),
+                           'vect__ngram_range': [(1, 1), (1, 2)],
+                           'tfidf__smooth_idf': (True, False),}
+
+    # Grid search
+    grid_obj = GridSearchCV(pipeline, parameters, n_jobs=-1)
+
+    return grid_obj
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    pass
+    # Get best estimator found by grid search
+    best_clf = model.best_estimator_
+    # Get predictions on test set
+    best_predictions = best_clf.predict(X_test)
+
+    # Print results
+    print(classification_report(Y_test, best_predictions, target_names=category_names))
 
 
 def save_model(model, model_filepath):
-    pass
+    filename = model_filepath
+    pickle.dump(model, open(filename, 'wb'))
 
 
 def main():
@@ -27,13 +74,13 @@ def main():
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
-        
+
         print('Building model...')
         model = build_model()
-        
+
         print('Training model...')
-        model.fit(X_train, Y_train)
-        
+        model = model.fit(X_train, Y_train)
+
         print('Evaluating model...')
         evaluate_model(model, X_test, Y_test, category_names)
 
