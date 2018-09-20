@@ -15,7 +15,7 @@ from sklearn.pipeline import Pipeline
 
 def load_data(database_filepath):
     # load data from database
-    engine = create_engine(database_filepath)
+    engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('InsertTableName', engine)
     #df.head()
     X = df['message']
