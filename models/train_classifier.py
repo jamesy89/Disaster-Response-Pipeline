@@ -18,6 +18,7 @@ nltk.download('punkt')
 
 
 def load_data(database_filepath):
+    """Loads the sqlite database from the given filepath and returns the features, targets, and target names"""
     # load data from database
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('InsertTableName', engine)
@@ -30,6 +31,7 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    """Tokenize, normalize, and lemmatize a given string"""
     # Normalize
     text = text.lower()
     # Tokenize
@@ -42,6 +44,7 @@ def tokenize(text):
 
 
 def build_model():
+    """Creates a ML pipeline for training the model, and initializes the GridSearchCV for tuning model"""
     # Create ML pipeline
     pipeline = Pipeline([('vect', CountVectorizer(tokenizer=tokenize)),
                         ('tfidf', TfidfTransformer()),
@@ -58,6 +61,7 @@ def build_model():
     return grid_obj
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """Uses the best estimator found by grid search to get predictions on the test set and print the results"""
     # Get best estimator found by grid search
     best_clf = model.best_estimator_
     # Get predictions on test set
@@ -68,6 +72,7 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    """Saves the trained model to a pickle file at the given path"""
     filename = model_filepath
     pickle.dump(model, open(filename, 'wb'))
 

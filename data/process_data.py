@@ -4,6 +4,7 @@ import pandas as pd
 from sqlalchemy import *
 
 def load_data(messages_filepath, categories_filepath):
+    """Loads the messages.csv and categories.csv files from the given filepaths and merges them"""
     # load messages dataset
     messages = pd.read_csv("disaster_messages.csv")
     #messages.head()
@@ -20,6 +21,7 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+    """Cleans the dataset by one-hot encoding the categories and removing duplicates and NaNs"""
     # create a dataframe of the 36 individual category columns
     categories = categories.categories.str.split(';', expand=True)
     #categories.head()
@@ -81,6 +83,7 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    """Saves the cleaned data to a sqlite database at the given filepath"""
     engine = create_engine(database_filename)
     df.to_sql('InsertTableName', engine, index=False)
 
