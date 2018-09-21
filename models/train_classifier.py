@@ -1,5 +1,7 @@
 import sys
 import pickle
+import nltk
+from nltk.stem.wordnet import WordNetLemmatizer
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.cross_validation import train_test_split
@@ -11,6 +13,8 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import fbeta_score, accuracy_score
 from sklearn.pipeline import Pipeline
+nltk.download('wordnet')
+nltk.download('punkt')
 
 
 def load_data(database_filepath):
@@ -26,22 +30,22 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
-    count_vect = CountVectorizer()
-    X_train_counts = count_vect.fit_transform(twenty_train.data)
-    X_train_counts.shape
+    # Normalize
+    text = text.lower()
+    # Tokenize
+    tokens = nltk.word_tokenize(text)
+    # Lemmatize
+    lmtzr = WordNetLemmatizer()
+    lemmatized = [lmtzr.lemmatize(word) for word in tokens]
 
-    tfidf_transformer = TfidfTransformer()
-    X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
-    X_train_tfidf.shape
-
-    return X_train_tf
+    return lemmatized
 
 
 def build_model():
     # Create ML pipeline
-    pipeline = Pipeline([('vect', CountVectorizer()),
-                      ('tfidf', TfidfTransformer()),
-                      ('clf', MultiOutputClassifier(MultinomialNB())),])
+    pipeline = Pipeline([('vect', CountVectorizer(tokenizer=tokenize)),
+                        ('tfidf', TfidfTransformer()),
+                        ('clf', MultiOutputClassifier(MultinomialNB())),])
 
     # Parameters to grid search
     parameters = parameters = {'tfidf__use_idf': (True, False),
