@@ -26,6 +26,7 @@ def load_data(database_filepath):
     X = df['message']
     Y = df.iloc[:,4:]
     categories = list(Y)
+    print(categories)
 
     return X, Y, categories
 

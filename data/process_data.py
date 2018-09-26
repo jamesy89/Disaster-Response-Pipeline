@@ -6,11 +6,11 @@ from sqlalchemy import *
 def load_data(messages_filepath, categories_filepath):
     """Loads the messages.csv and categories.csv files from the given filepaths and merges them"""
     # load messages dataset
-    messages = pd.read_csv("disaster_messages.csv")
+    messages = pd.read_csv(messages_filepath)
     #messages.head()
 
     # load categories dataset
-    categories = pd.read_csv("disaster_categories.csv")
+    categories = pd.read_csv(categories_filepath)
     #categories.head()
 
     # merge datasets
@@ -23,7 +23,8 @@ def load_data(messages_filepath, categories_filepath):
 def clean_data(df):
     """Cleans the dataset by one-hot encoding the categories and removing duplicates and NaNs"""
     # create a dataframe of the 36 individual category columns
-    categories = categories.categories.str.split(';', expand=True)
+    categories = df.categories.str.split(';', expand=True)
+    #print(categories)
     #categories.head()
 
     # select the first row of the categories dataframe
@@ -41,19 +42,21 @@ def clean_data(df):
 
         #print(category_colnames)
         # rename the columns of `categories`
-        categories.columns = category_colnames
-        #categories.head()
+    categories.columns = category_colnames
+    #print(categories)
+    #categories.head()
 
-        for column in categories:
+    for column in categories:
         #print(categories[column])
         # set each value to be the last character of the string
         value = categories[column].str[-1:]
         categories[column] = value
 
+        #print(categories[column])
         #print(categories[column][1])
-        # convert column from string to numeric
         categories[column] = int(categories[column][1])
     #categories.head()
+    #print(categories)
 
     # drop the original categories column from `df`
     df = df.drop('categories', axis = 1)
@@ -84,7 +87,7 @@ def clean_data(df):
 
 def save_data(df, database_filename):
     """Saves the cleaned data to a sqlite database at the given filepath"""
-    engine = create_engine(database_filename)
+    engine = create_engine('sqlite:///' + database_filename)
     df.to_sql('InsertTableName', engine, index=False)
 
 

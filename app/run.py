@@ -26,11 +26,11 @@ def tokenize(text):
     return clean_tokens
 
 # load data
-engine = create_engine('sqlite:///../data/InsertDatabaseName.db')
+engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('InsertTableName', engine)
 
 # load model
-model = joblib.load("../models/finalized_model.sav")
+model = joblib.load("../models/classifier.pkl")
 
 
 # index webpage displays cool visuals and receives user input text for model
@@ -46,6 +46,7 @@ def index():
     #request_counts = df['request'].value_counts()
     #print(request_counts)
     storm_counts = df['storm'].value_counts()
+    #print(storm_counts)
 
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
